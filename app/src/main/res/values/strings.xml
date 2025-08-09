@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">Opn EMarket</string>
     <string name="error_generic">Unexpected error</string>
+    <string name="retry">Retry</string>
+    <string name="something_went_wrong">Something went wrong. Please try again.</string>
+    <string name="open_and_close_time">Open from %1$s to %2$s</string>
 </resources>
