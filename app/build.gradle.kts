@@ -60,14 +60,14 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs[BuildTypes.RELEASE]
-            buildConfigField("String", "BASE_API_URL", "\"https://jsonplaceholder.typicode.com/\"")
+            buildConfigField("String", "BASE_API_URL", "\"https://c8d92d0a-6233-4ef7-a229-5a91deb91ea1.mock.pstmn.io/\"")
         }
 
         debug {
             // For quickly testing build with proguard, enable this
             isMinifyEnabled = false
             signingConfig = signingConfigs[BuildTypes.DEBUG]
-            buildConfigField("String", "BASE_API_URL", "\"https://jsonplaceholder.typicode.com/\"")
+            buildConfigField("String", "BASE_API_URL", "\"https://c8d92d0a-6233-4ef7-a229-5a91deb91ea1.mock.pstmn.io/\"")
         }
     }
 

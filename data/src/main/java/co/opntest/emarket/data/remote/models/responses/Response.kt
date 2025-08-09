@@ -3,6 +3,7 @@ package co.opntest.emarket.data.remote.models.responses
 import co.opntest.emarket.domain.models.Model
 import com.squareup.moshi.Json
 
+// TODO Remove this later
 data class Response(
     @Json(name = "id") val id: Int?
 )

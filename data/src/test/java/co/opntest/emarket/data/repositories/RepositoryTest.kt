@@ -1,6 +1,6 @@
 package co.opntest.emarket.data.repositories
 
-import co.opntest.emarket.data.remote.models.responses.toModels
+import co.opntest.emarket.data.remote.models.responses.toModel
 import co.opntest.emarket.data.remote.services.ApiService
 import co.opntest.emarket.data.test.MockUtil
 import co.opntest.emarket.domain.repositories.Repository
@@ -27,21 +27,21 @@ class RepositoryTest {
     }
 
     @Test
-    fun `When request successful, it returns success`() = runTest {
-        val expected = MockUtil.responses
-        coEvery { mockService.getResponses() } returns expected
+    fun `When calling getStoreDetail successful, it returns success`() = runTest {
+        val expected = MockUtil.storeDetailResponse
+        coEvery { mockService.getStoreDetail() } returns expected
 
-        repository.getModels().collect {
-            it shouldBe expected.toModels()
+        repository.getStoreDetail().collect {
+            it shouldBe expected.toModel()
         }
     }
 
     @Test
-    fun `When request failed, it returns error`() = runTest {
+    fun `When calling getStoreDetail failed, it returns error`() = runTest {
         val expected = Throwable()
-        coEvery { mockService.getResponses() } throws expected
+        coEvery { mockService.getStoreDetail() } throws expected
 
-        repository.getModels().catch {
+        repository.getStoreDetail().catch {
             it shouldBe expected
         }.collect()
     }

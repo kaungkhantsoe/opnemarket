@@ -1,11 +1,13 @@
 package co.opntest.emarket.data.test
 
 import co.opntest.emarket.data.remote.models.responses.ErrorResponse
+import co.opntest.emarket.data.remote.models.responses.StoreDetailResponse
 import io.mockk.every
 import io.mockk.mockk
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import retrofit2.Response
+import java.time.LocalTime
 
 object MockUtil {
 
@@ -30,7 +32,10 @@ object MockUtil {
         message = "message"
     )
 
-    val responses = listOf(
-        co.opntest.emarket.data.remote.models.responses.Response(id = 1)
+    val storeDetailResponse = StoreDetailResponse(
+        name = "Store",
+        rating = 4.6,
+        openingTime = LocalTime.of(15, 30, 45, 365000000),
+        closingTime = LocalTime.of(19, 45, 51, 365000000)
     )
 }
