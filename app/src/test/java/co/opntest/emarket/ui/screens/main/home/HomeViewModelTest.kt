@@ -1,7 +1,7 @@
 package co.opntest.emarket.ui.screens.main.home
 
 import app.cash.turbine.test
-import co.opntest.emarket.domain.usecases.UseCase
+import co.opntest.emarket.domain.usecases.GetStoreDetailUseCase
 import co.opntest.emarket.test.CoroutineTestRule
 import co.opntest.emarket.test.MockUtil
 import co.opntest.emarket.ui.models.toUiModel
@@ -21,28 +21,28 @@ class HomeViewModelTest {
     @get:Rule
     val coroutinesRule = CoroutineTestRule()
 
-    private val mockUseCase: UseCase = mockk()
+    private val mockGetStoreDetailUseCase: GetStoreDetailUseCase = mockk()
 
     private lateinit var viewModel: HomeViewModel
 
     @Before
     fun setUp() {
-        every { mockUseCase() } returns flowOf(MockUtil.models)
+        every { mockGetStoreDetailUseCase() } returns flowOf(MockUtil.storeDetail)
 
         initViewModel()
     }
 
     @Test
-    fun `When loading models successfully, it shows the model list`() = runTest {
-        viewModel.uiModels.test {
-            expectMostRecentItem() shouldBe MockUtil.models.map { it.toUiModel() }
+    fun `When loading store detail successfully, it shows the store detail`() = runTest {
+        viewModel.storeDetail.test {
+            expectMostRecentItem() shouldBe MockUtil.storeDetail.toUiModel()
         }
     }
 
     @Test
-    fun `When loading models failed, it shows the corresponding error`() = runTest {
+    fun `When loading store detail failed, it shows the corresponding error`() = runTest {
         val error = Exception()
-        every { mockUseCase() } returns flow { throw error }
+        every { mockGetStoreDetailUseCase() } returns flow { throw error }
         initViewModel(dispatchers = CoroutineTestRule(StandardTestDispatcher()).testDispatcherProvider)
 
         viewModel.error.test {
@@ -66,7 +66,7 @@ class HomeViewModelTest {
     private fun initViewModel(dispatchers: DispatchersProvider = coroutinesRule.testDispatcherProvider) {
         viewModel = HomeViewModel(
             dispatchers,
-            mockUseCase
+            mockGetStoreDetailUseCase
         )
     }
 }

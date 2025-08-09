@@ -9,6 +9,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -39,12 +42,19 @@ fun HomeScreen(
 
     val storeDetail by viewModel.storeDetail.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    var isError by remember { mutableStateOf(false) }
+
+    viewModel.error.collectAsEffect {
+        isError = true
+    }
 
     HomeScreenContent(
         isLoading = isLoading,
+        isError = isError,
         storeDetail = storeDetail,
         onRetry = {
-            // TODO integrate retry logic
+            isError = false
+            viewModel.getStoreDetail()
         }
     )
 }
@@ -53,6 +63,7 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenContent(
     isLoading: IsLoading,
+    isError: Boolean,
     storeDetail: StoreDetailUiModel?,
     onRetry: () -> Unit,
 ) {
@@ -89,13 +100,16 @@ private fun HomeScreenContent(
                     }
                 }
             }
-            if (isLoading) {
-                AppLoadingContent()
-            } else if (storeDetail == null) {
+
+            if (isError) {
                 ErrorScreenContent(
                     onRetry = onRetry,
                     modifier = Modifier.fillMaxSize()
                 )
+            }
+
+            if (isLoading) {
+                AppLoadingContent()
             }
         }
     )
@@ -110,6 +124,7 @@ private fun HomeScreenPreview(
     ) {
     ComposeTheme {
         HomeScreenContent(
+            isError = param.isError,
             isLoading = param.isLoading,
             storeDetail = param.storeDetail,
             onRetry = {}
@@ -127,13 +142,18 @@ private class HomeScreenPreviewParameters : PreviewParameterProvider<HomeScreenP
 
     override val values: Sequence<Params>
         get() = sequenceOf(
-            Params(),
             Params(isLoading = true),
+            Params(isError = true),
+            Params(
+                isLoading = true,
+                isError = true
+            ),
             Params(storeDetail = storeDetail)
         )
 
     data class Params(
         val isLoading: IsLoading = false,
-        val storeDetail: StoreDetailUiModel? = null
+        val storeDetail: StoreDetailUiModel? = null,
+        val isError: Boolean = false,
     )
 }
