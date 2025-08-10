@@ -1,6 +1,7 @@
 package co.opntest.emarket.domain.repositories
 
 import co.opntest.emarket.domain.models.Model
+import co.opntest.emarket.domain.models.PlaceOrderModel
 import co.opntest.emarket.domain.models.ProductModel
 import co.opntest.emarket.domain.models.StoreDetailModel
 import kotlinx.coroutines.flow.Flow
@@ -13,4 +14,6 @@ interface Repository {
     fun getStoreDetail(): Flow<StoreDetailModel>
 
     fun getProductList(): Flow<List<ProductModel>>
+
+    fun placeOrder(placeOrderModel: PlaceOrderModel): Flow<Unit>
 }

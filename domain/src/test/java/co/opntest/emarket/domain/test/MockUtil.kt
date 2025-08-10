@@ -1,5 +1,6 @@
 package co.opntest.emarket.domain.test
 
+import co.opntest.emarket.domain.models.PlaceOrderModel
 import co.opntest.emarket.domain.models.ProductModel
 import co.opntest.emarket.domain.models.StoreDetailModel
 import java.time.LocalTime
@@ -17,5 +18,10 @@ object MockUtil {
         name = "name",
         price = 100.0,
         imageUrl = "https://example.com/image.jpg"
+    )
+
+    val placeOrder = PlaceOrderModel(
+        products = listOf(product),
+        deliveryAddress = "123 Main St, City, Country",
     )
 }

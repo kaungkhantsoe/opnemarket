@@ -3,6 +3,8 @@ package co.opntest.emarket.data.test
 import co.opntest.emarket.data.remote.models.responses.ErrorResponse
 import co.opntest.emarket.data.remote.models.responses.ProductResponse
 import co.opntest.emarket.data.remote.models.responses.StoreDetailResponse
+import co.opntest.emarket.domain.models.PlaceOrderModel
+import co.opntest.emarket.domain.models.ProductModel
 import io.mockk.every
 import io.mockk.mockk
 import okhttp3.ResponseBody
@@ -44,5 +46,16 @@ object MockUtil {
         name = "Product",
         price = 100.0,
         imageUrl = "https://example.com/image.png"
+    )
+
+    val placeOrderModel = PlaceOrderModel(
+        products = listOf(
+            ProductModel(
+                name = "Product",
+                price = 100.0,
+                imageUrl = "https://example.com/image.png"
+            )
+        ),
+        deliveryAddress = "123 Main St, City, Country"
     )
 }

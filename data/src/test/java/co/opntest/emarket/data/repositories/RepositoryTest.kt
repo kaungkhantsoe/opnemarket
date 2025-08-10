@@ -6,7 +6,9 @@ import co.opntest.emarket.data.remote.services.ApiService
 import co.opntest.emarket.data.test.MockUtil
 import co.opntest.emarket.domain.repositories.Repository
 import io.kotest.matchers.shouldBe
+import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
@@ -63,6 +65,25 @@ class RepositoryTest {
         coEvery { mockService.getProductList() } throws expected
 
         repository.getProductList().catch {
+            it shouldBe expected
+        }.collect()
+    }
+
+    @Test
+    fun `When calling placeOrder successful, it returns success`() = runTest {
+        coEvery { mockService.placeOrder(any()) } just Runs
+
+        repository.placeOrder(MockUtil.placeOrderModel).collect {
+            it shouldBe Unit
+        }
+    }
+
+    @Test
+    fun `When calling placeOrder failed, it returns error`() = runTest {
+        val expected = Throwable()
+        coEvery { mockService.placeOrder(any()) } throws expected
+
+        repository.placeOrder(MockUtil.placeOrderModel).catch {
             it shouldBe expected
         }.collect()
     }
