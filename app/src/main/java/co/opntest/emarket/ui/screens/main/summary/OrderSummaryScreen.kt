@@ -1,30 +1,42 @@
 package co.opntest.emarket.ui.screens.main.summary
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,7 +58,7 @@ fun OrderSummaryScreen(
 
     OrderSummaryScreenContent(
         products = products,
-        totalPrice = viewModel.getTotalPrice()
+        totalPrice = viewModel.getTotalPrice(),
     )
 }
 
@@ -56,6 +68,9 @@ private fun OrderSummaryScreenContent(
     products: List<ProductUiModel>,
     totalPrice: Double,
 ) {
+    val focusManager = LocalFocusManager.current
+    var deliveryAddress by remember { mutableStateOf("") }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,30 +80,51 @@ private fun OrderSummaryScreenContent(
             )
         },
         bottomBar = {
-            Button(
-                onClick = {},
-                content = {
-                    Row {
-                        Text(
-                            stringResource(R.string.place_order)
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            stringResource(R.string.product_total_price, totalPrice.toString())
-                        )
-                    }
-                },
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(AppTheme.dimensions.spacingMedium)
-                    .testTag(stringResource(R.string.place_order_button))
-            )
-        }
+                    .navigationBarsPadding()
+                    .imePadding()
+            ) {
+                TextField(
+                    value = deliveryAddress,
+                    onValueChange = {
+                        deliveryAddress = it
+                    },
+                    label = { Text(stringResource(R.string.delivery_address)) },
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = { focusManager.clearFocus(force = true) }
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(AppTheme.dimensions.spacingMedium))
+
+                Button(
+                    onClick = {},
+                    content = {
+                        Row {
+                            Text(
+                                stringResource(R.string.place_order)
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+                            Text(
+                                stringResource(R.string.product_total_price, totalPrice.toString())
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(stringResource(R.string.place_order_button))
+                )
+            }
+        },
     ) { paddingValues ->
         LazyColumn(
             contentPadding = PaddingValues(AppTheme.dimensions.spacingMedium),
             verticalArrangement = Arrangement.spacedBy(AppTheme.dimensions.spacingMedium),
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues).focusable()
         ) {
             items(products) { product ->
                 ProductItem(product)
@@ -151,6 +187,6 @@ private fun OrderSummaryScreenPreview() {
                 selectedCount = 1
             )
         ),
-        totalPrice = 100.0
+        totalPrice = 100.0,
     )
 }

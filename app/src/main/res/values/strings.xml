@@ -11,4 +11,5 @@
     <string name="product_total_price">Total: %s฿</string>
     <string name="order_summary">Order Summary</string>
     <string name="place_order">Place Order</string>
+    <string name="delivery_address">Delivery Address</string>
 </resources>
