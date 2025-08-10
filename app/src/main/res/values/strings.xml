@@ -7,4 +7,8 @@
     <string name="open_and_close_time">Open from %1$s to %2$s</string>
     <string name="price">%s฿</string>
     <string name="view_order">View order</string>
+    <string name="product_count_and_name">%1$sx %2$s</string>
+    <string name="product_total_price">Total: %s฿</string>
+    <string name="order_summary">Order Summary</string>
+    <string name="place_order">Place Order</string>
 </resources>
