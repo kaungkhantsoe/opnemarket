@@ -1,11 +1,13 @@
 package co.opntest.emarket.ui.screens.main.home
 
 import androidx.lifecycle.viewModelScope
+import co.opntest.emarket.domain.usecases.GetProductListUseCase
 import co.opntest.emarket.domain.usecases.GetStoreDetailUseCase
 import co.opntest.emarket.ui.base.BaseViewModel
 import co.opntest.emarket.ui.models.ProductUiModel
 import co.opntest.emarket.ui.models.StoreDetailUiModel
 import co.opntest.emarket.ui.models.toUiModel
+import co.opntest.emarket.ui.models.toUiModelList
 import co.opntest.emarket.util.DispatchersProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -15,6 +17,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val dispatchersProvider: DispatchersProvider,
     private val getStoreDetailUseCase: GetStoreDetailUseCase,
+    private val getProductListUseCase: GetProductListUseCase,
 ) : BaseViewModel() {
 
     private val _storeDetail = MutableStateFlow<StoreDetailUiModel?>(null)
@@ -25,18 +28,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         getStoreDetail()
-        _products.value = listOf(
-            ProductUiModel(
-                name = "Latte",
-                price = 50.0,
-                imageUrl = "https://www.nespresso.com/ncp/res/uploads/recipes/nespresso-recipes-Latte-Art-Tulip.jpg",
-            ),
-            ProductUiModel(
-                name = "Dark Tiramisu Mocha",
-                price = 75.0,
-                imageUrl = "https://www.nespresso.com/shared_res/mos/free_html/sg/b2b/b2ccoffeerecipes/listing-image/image/dark-tiramisu-mocha.jpg",
-            ),
-        )
+        getProductList()
     }
 
     fun getStoreDetail() {
@@ -48,5 +40,27 @@ class HomeViewModel @Inject constructor(
             .flowOn(dispatchersProvider.io)
             .catch { e -> _error.emit(e) }
             .launchIn(viewModelScope)
+    }
+
+    fun getProductList() {
+        getProductListUseCase()
+            .injectLoading()
+            .onEach { result ->
+                _products.emit(result.toUiModelList())
+            }
+            .flowOn(dispatchersProvider.io)
+            .catch { e -> _error.emit(e) }
+            .launchIn(viewModelScope)
+    }
+
+    fun updateProductCount(count: Int, product: ProductUiModel) {
+        val updatedProducts = _products.value.map {
+            if (it.name == product.name) {
+                it.copy(selectedCount = count)
+            } else {
+                it
+            }
+        }
+        _products.value = updatedProducts
     }
 }

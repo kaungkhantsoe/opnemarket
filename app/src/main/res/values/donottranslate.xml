@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="product_image" translatable="false">product_image</string>
+    <string name="minus_button" translatable="false">minus_button</string>
+    <string name="plus_button" translatable="false">plus_button</string>
+    <string name="counter_button" translatable="false">counter_button</string>
 </resources>

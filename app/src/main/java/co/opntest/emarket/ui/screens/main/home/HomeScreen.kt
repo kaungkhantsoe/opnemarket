@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,15 +51,15 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) = BaseScreen {
     val context = LocalContext.current
-    viewModel.error.collectAsEffect { e -> e.showToast(context) }
 
     val storeDetail by viewModel.storeDetail.collectAsStateWithLifecycle()
     val products by viewModel.products.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     var isError by remember { mutableStateOf(false) }
 
-    viewModel.error.collectAsEffect {
+    viewModel.error.collectAsEffect { e ->
         isError = true
+        e.showToast(context)
     }
 
     HomeScreenContent(
@@ -69,10 +70,9 @@ fun HomeScreen(
         onRetry = {
             isError = false
             viewModel.getStoreDetail()
+            viewModel.getProductList()
         },
-        onItemCountChange = { itemCount, productUiModel ->
-            // TODO Handle item count change action
-        }
+        onItemCountChange = viewModel::updateProductCount
     )
 }
 
@@ -165,7 +165,9 @@ private fun ProductItem(
                 contentScale = ContentScale.FillBounds,
                 model = product.imageUrl,
                 contentDescription = stringResource(R.string.product_image),
-                modifier = Modifier.size(AppTheme.dimensions.imageSize),
+                modifier = Modifier
+                    .size(AppTheme.dimensions.imageSize)
+                    .testTag(stringResource(R.string.product_image)),
             )
             Column(
                 horizontalAlignment = Alignment.End,

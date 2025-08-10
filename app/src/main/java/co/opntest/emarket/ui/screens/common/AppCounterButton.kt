@@ -28,7 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -108,10 +110,12 @@ fun AppCounterButton(
                                 styles.counterColor(false)
                             },
                             // Allow default clicks behavior with no throttle
-                            modifier = Modifier.clickable(
-                                enabled = (isExpandable || itemCount > minCount) && enabled,
-                                onClick = { itemCount -= 1 }
-                            ),
+                            modifier = Modifier
+                                .clickable(
+                                    enabled = (isExpandable || itemCount > minCount) && enabled,
+                                    onClick = { itemCount -= 1 }
+                                )
+                                .testTag(stringResource(R.string.minus_button)),
                         )
                     }
                     Text(
@@ -129,10 +133,12 @@ fun AppCounterButton(
                             contentDescription = null,
                             tint = styles.counterColor(enabled),
                             // Allow default clicks behavior with no throttle
-                            modifier = Modifier.clickable(
-                                enabled = enabled,
-                                onClick = { itemCount += 1 }
-                            )
+                            modifier = Modifier
+                                .clickable(
+                                    enabled = enabled,
+                                    onClick = { itemCount += 1 }
+                                )
+                                .testTag(stringResource(R.string.plus_button))
                         )
                     }
                 }
@@ -153,6 +159,7 @@ fun AppCounterButton(
                                 this
                             }
                         }
+                        .testTag(stringResource(R.string.counter_button))
                 )
             }
         }
