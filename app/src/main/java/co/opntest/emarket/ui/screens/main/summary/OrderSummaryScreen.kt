@@ -17,6 +17,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.opntest.emarket.R
 import co.opntest.emarket.ui.models.ProductUiModel
 import co.opntest.emarket.ui.theme.AppTheme
@@ -32,17 +35,26 @@ import coil3.compose.AsyncImage
 
 @Composable
 fun OrderSummaryScreen(
+    productList: List<ProductUiModel>,
     viewModel: OrderSummaryViewModel = hiltViewModel(),
 ) {
+    val products by viewModel.products.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.setProducts(productList)
+    }
+
     OrderSummaryScreenContent(
-        products = viewModel.products,
+        products = products,
+        totalPrice = viewModel.getTotalPrice()
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun OrderSummaryScreenContent(
-    products: List<ProductUiModel>
+    products: List<ProductUiModel>,
+    totalPrice: Double,
 ) {
     Scaffold(
         topBar = {
@@ -62,13 +74,14 @@ private fun OrderSummaryScreenContent(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            stringResource(R.string.product_total_price, "100.0")
+                            stringResource(R.string.product_total_price, totalPrice.toString())
                         )
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(AppTheme.dimensions.spacingMedium)
+                    .testTag(stringResource(R.string.place_order_button))
             )
         }
     ) { paddingValues ->
@@ -138,5 +151,6 @@ private fun OrderSummaryScreenPreview() {
                 selectedCount = 1
             )
         ),
+        totalPrice = 100.0
     )
 }

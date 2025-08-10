@@ -51,7 +51,7 @@ import coil3.compose.AsyncImage
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onClickViewOrder: () -> Unit,
+    onClickViewOrder: (products: List<ProductUiModel>) -> Unit,
 ) = BaseScreen {
     val context = LocalContext.current
 
@@ -66,6 +66,7 @@ fun HomeScreen(
     }
 
     HomeScreenContent(
+        enableViewOrder = viewModel.getSelectedProducts().isNotEmpty(),
         isError = isError,
         isLoading = isLoading,
         products = products,
@@ -76,13 +77,16 @@ fun HomeScreen(
             viewModel.getProductList()
         },
         onItemCountChange = viewModel::updateProductCount,
-        onClickViewOrder = onClickViewOrder
+        onClickViewOrder = {
+            onClickViewOrder(viewModel.getSelectedProducts())
+        }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreenContent(
+    enableViewOrder: Boolean,
     isError: Boolean,
     isLoading: IsLoading,
     products: List<ProductUiModel>,
@@ -94,6 +98,7 @@ private fun HomeScreenContent(
     Scaffold(
         bottomBar = {
             Button(
+                enabled = enableViewOrder,
                 onClick = onClickViewOrder,
                 content = {
                     Text(text = stringResource(R.string.view_order))
@@ -223,6 +228,7 @@ private fun HomeScreenPreview(
     ) {
     ComposeTheme {
         HomeScreenContent(
+            enableViewOrder = param.enableViewOrder,
             isError = param.isError,
             isLoading = param.isLoading,
             storeDetail = param.storeDetail,
@@ -266,7 +272,8 @@ private class HomeScreenPreviewParameters : PreviewParameterProvider<HomeScreenP
             ),
             Params(
                 storeDetail = storeDetail,
-                products = products
+                products = products,
+                enableViewOrder = true
             )
         )
 
@@ -275,5 +282,6 @@ private class HomeScreenPreviewParameters : PreviewParameterProvider<HomeScreenP
         val storeDetail: StoreDetailUiModel? = null,
         val isError: Boolean = false,
         val products: List<ProductUiModel> = emptyList(),
+        val enableViewOrder: Boolean = false,
     )
 }

@@ -101,6 +101,17 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `When calling getSelectedProducts, it returns products with selected count greater than 0`() = runTest {
+        initViewModel()
+
+        viewModel.getSelectedProducts() shouldBe emptyList()
+
+        viewModel.updateProductCount(2, MockUtil.productModel.toUiModel())
+
+        viewModel.getSelectedProducts() shouldBe listOf(MockUtil.productModel.toUiModel().copy(selectedCount = 2))
+    }
+
+    @Test
     fun `When loading models, it shows and hides loading correctly`() = runTest {
         initViewModel(dispatchers = CoroutineTestRule(StandardTestDispatcher()).testDispatcherProvider)
 

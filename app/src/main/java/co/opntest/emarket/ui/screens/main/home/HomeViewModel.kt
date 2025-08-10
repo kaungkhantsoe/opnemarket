@@ -63,4 +63,8 @@ class HomeViewModel @Inject constructor(
         }
         _products.value = updatedProducts
     }
+
+    fun getSelectedProducts(): List<ProductUiModel> {
+        return _products.value.filter { it.selectedCount > 0 }
+    }
 }

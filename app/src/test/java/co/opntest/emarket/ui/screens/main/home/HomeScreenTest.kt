@@ -8,6 +8,7 @@ import co.opntest.emarket.R
 import co.opntest.emarket.domain.usecases.GetProductListUseCase
 import co.opntest.emarket.domain.usecases.GetStoreDetailUseCase
 import co.opntest.emarket.test.MockUtil
+import co.opntest.emarket.ui.models.ProductUiModel
 import co.opntest.emarket.ui.models.toUiModel
 import co.opntest.emarket.ui.screens.BaseScreenTest
 import co.opntest.emarket.ui.screens.MainActivity
@@ -31,7 +32,7 @@ class HomeScreenTest : BaseScreenTest() {
 
     private val mockGetStoreDetailUseCase: GetStoreDetailUseCase = mockk()
     private val mockGetProductListUseCase: GetProductListUseCase = mockk()
-    private val mockOnClickViewOrder: () -> Unit = mockk()
+    private val mockOnClickViewOrder: (List<ProductUiModel>) -> Unit = mockk()
 
     private lateinit var viewModel: HomeViewModel
 
@@ -39,7 +40,7 @@ class HomeScreenTest : BaseScreenTest() {
     fun setUp() {
         every { mockGetStoreDetailUseCase() } returns flowOf(MockUtil.storeDetail)
         every { mockGetProductListUseCase() } returns flowOf(listOf(MockUtil.productModel))
-        every { mockOnClickViewOrder() } just Runs
+        every { mockOnClickViewOrder(any()) } just Runs
     }
 
     @Test
@@ -156,9 +157,37 @@ class HomeScreenTest : BaseScreenTest() {
             composeRule.waitForIdle()
             advanceUntilIdle()
 
+            viewModel.updateProductCount(1, MockUtil.productModel.toUiModel())
+
             onNodeWithText(activity.getString(R.string.view_order)).performClick()
 
-            verify { mockOnClickViewOrder() }
+            verify { mockOnClickViewOrder(any()) }
+        }
+    }
+
+    @Test
+    fun `When user did not add any product, view order button is disabled`() {
+        setStandardTestDispatcher()
+
+        initComposable {
+            composeRule.waitForIdle()
+            advanceUntilIdle()
+
+            onNodeWithText(activity.getString(R.string.view_order)).assertIsNotEnabled()
+        }
+    }
+
+    @Test
+    fun `When user add a product, view order button is enabled`() {
+        setStandardTestDispatcher()
+
+        initComposable {
+            composeRule.waitForIdle()
+            advanceUntilIdle()
+
+            viewModel.updateProductCount(1, MockUtil.productModel.toUiModel())
+
+            onNodeWithText(activity.getString(R.string.view_order)).assertIsEnabled()
         }
     }
 
