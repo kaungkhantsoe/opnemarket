@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -49,6 +50,7 @@ import coil3.compose.AsyncImage
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    onClickViewOrder: () -> Unit,
 ) = BaseScreen {
     val context = LocalContext.current
 
@@ -72,7 +74,8 @@ fun HomeScreen(
             viewModel.getStoreDetail()
             viewModel.getProductList()
         },
-        onItemCountChange = viewModel::updateProductCount
+        onItemCountChange = viewModel::updateProductCount,
+        onClickViewOrder = onClickViewOrder
     )
 }
 
@@ -85,10 +88,21 @@ private fun HomeScreenContent(
     storeDetail: StoreDetailUiModel?,
     onRetry: () -> Unit,
     onItemCountChange: (itemCount: Int, productUiModel: ProductUiModel) -> Unit,
+    onClickViewOrder: () -> Unit,
 ) {
     Scaffold(
+        bottomBar = {
+            Button(
+                onClick = onClickViewOrder,
+                content = {
+                    Text(text = stringResource(R.string.view_order))
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(AppTheme.dimensions.spacingMedium)
+            )
+        },
         content = { paddingValues ->
-
             LazyColumn(
                 contentPadding = PaddingValues(AppTheme.dimensions.spacingMedium),
                 verticalArrangement = Arrangement.spacedBy(AppTheme.dimensions.spacingMedium),
@@ -215,7 +229,8 @@ private fun HomeScreenPreview(
             storeDetail = param.storeDetail,
             products = param.products,
             onRetry = {},
-            onItemCountChange = { _, _ -> }
+            onItemCountChange = { _, _ -> },
+            onClickViewOrder = {}
         )
     }
 }

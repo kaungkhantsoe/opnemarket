@@ -12,8 +12,11 @@ import co.opntest.emarket.ui.models.toUiModel
 import co.opntest.emarket.ui.screens.BaseScreenTest
 import co.opntest.emarket.ui.screens.MainActivity
 import co.opntest.emarket.ui.theme.ComposeTheme
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.*
@@ -28,6 +31,7 @@ class HomeScreenTest : BaseScreenTest() {
 
     private val mockGetStoreDetailUseCase: GetStoreDetailUseCase = mockk()
     private val mockGetProductListUseCase: GetProductListUseCase = mockk()
+    private val mockOnClickViewOrder: () -> Unit = mockk()
 
     private lateinit var viewModel: HomeViewModel
 
@@ -35,6 +39,7 @@ class HomeScreenTest : BaseScreenTest() {
     fun setUp() {
         every { mockGetStoreDetailUseCase() } returns flowOf(MockUtil.storeDetail)
         every { mockGetProductListUseCase() } returns flowOf(listOf(MockUtil.productModel))
+        every { mockOnClickViewOrder() } just Runs
     }
 
     @Test
@@ -143,6 +148,20 @@ class HomeScreenTest : BaseScreenTest() {
         }
     }
 
+    @Test
+    fun `When clicking view order button, it calls onClickViewOrder for navigation`() {
+        setStandardTestDispatcher()
+
+        initComposable {
+            composeRule.waitForIdle()
+            advanceUntilIdle()
+
+            onNodeWithText(activity.getString(R.string.view_order)).performClick()
+
+            verify { mockOnClickViewOrder() }
+        }
+    }
+
     private fun initComposable(
         testBody: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>.() -> Unit,
     ) {
@@ -152,6 +171,7 @@ class HomeScreenTest : BaseScreenTest() {
             ComposeTheme {
                 HomeScreen(
                     viewModel = viewModel,
+                    onClickViewOrder = mockOnClickViewOrder
                 )
             }
         }
