@@ -13,6 +13,8 @@ class AppDimensions {
     val spacingXLarge = 24.dp
     val spacing2XLarge = 28.dp
     val spacing3XLarge = 32.dp
+
+    val imageSize = 100.dp
 }
 
 internal val LocalAppDimensions = staticCompositionLocalOf { AppDimensions() }

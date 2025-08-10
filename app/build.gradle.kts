@@ -143,6 +143,9 @@ dependencies {
 
     implementation(libs.nimble.common)
 
+    implementation(libs.compose.coil)
+    implementation(libs.compose.coil.network.okhttp)
+
     // Unit test
     testImplementation(libs.bundles.unitTest)
     testImplementation(libs.test.turbine)
