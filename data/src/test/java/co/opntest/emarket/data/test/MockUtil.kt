@@ -1,6 +1,7 @@
 package co.opntest.emarket.data.test
 
 import co.opntest.emarket.data.remote.models.responses.ErrorResponse
+import co.opntest.emarket.data.remote.models.responses.ProductResponse
 import co.opntest.emarket.data.remote.models.responses.StoreDetailResponse
 import io.mockk.every
 import io.mockk.mockk
@@ -37,5 +38,11 @@ object MockUtil {
         rating = 4.6,
         openingTime = LocalTime.of(15, 30, 45, 365000000),
         closingTime = LocalTime.of(19, 45, 51, 365000000)
+    )
+
+    val productResponse = ProductResponse(
+        name = "Product",
+        price = 100.0,
+        imageUrl = "https://example.com/image.png"
     )
 }
