@@ -67,4 +67,8 @@ class HomeViewModel @Inject constructor(
     fun getSelectedProducts(): List<ProductUiModel> {
         return _products.value.filter { it.selectedCount > 0 }
     }
+
+    fun clearSelectedProducts() {
+        _products.value = _products.value.map { it.copy(selectedCount = 0) }
+    }
 }

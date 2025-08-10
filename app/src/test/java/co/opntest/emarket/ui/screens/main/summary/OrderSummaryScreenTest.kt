@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import co.opntest.emarket.R
 import co.opntest.emarket.domain.usecases.PlaceOrderUseCase
@@ -15,8 +16,12 @@ import co.opntest.emarket.ui.models.toUiModel
 import co.opntest.emarket.ui.screens.BaseScreenTest
 import co.opntest.emarket.ui.screens.MainActivity
 import co.opntest.emarket.ui.theme.ComposeTheme
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
@@ -31,6 +36,7 @@ class OrderSummaryScreenTest : BaseScreenTest() {
     val composeRule = createAndroidComposeRule<MainActivity>()
 
     private val mockPlaceOrderUseCase: PlaceOrderUseCase = mockk()
+    private val mockOnOrderSuccess: () -> Unit = mockk()
 
     private lateinit var viewModel: OrderSummaryViewModel
     private val productList = listOf(MockUtil.productModel.toUiModel().copy(selectedCount = 2))
@@ -38,6 +44,7 @@ class OrderSummaryScreenTest : BaseScreenTest() {
     @Before
     fun setUp() {
         every { mockPlaceOrderUseCase(any()) } returns flowOf(Unit)
+        every { mockOnOrderSuccess() } just Runs
     }
 
     @Test
@@ -85,6 +92,44 @@ class OrderSummaryScreenTest : BaseScreenTest() {
         }
     }
 
+    @Test
+    fun `When clicking on place order button and the order is successful, it navigates to order success`() {
+        setStandardTestDispatcher()
+        initComposable {
+            composeRule.waitForIdle()
+            advanceUntilIdle()
+
+            viewModel.setProducts(productList)
+
+            onNodeWithTag(activity.getString(R.string.place_order_button)).performClick()
+
+            composeRule.waitForIdle()
+            advanceUntilIdle()
+
+            verify { mockOnOrderSuccess() }
+        }
+    }
+
+    @Test
+    fun `When clicking on place order button and the order is not successful, it does not navigate to order success`() {
+        setStandardTestDispatcher()
+        every { mockPlaceOrderUseCase(any()) } returns flow { throw Exception() }
+
+        initComposable {
+            composeRule.waitForIdle()
+            advanceUntilIdle()
+
+            viewModel.setProducts(productList)
+
+            onNodeWithTag(activity.getString(R.string.place_order_button)).performClick()
+
+            composeRule.waitForIdle()
+            advanceUntilIdle()
+
+            verify(exactly = 0) { mockOnOrderSuccess() }
+        }
+    }
+
     private fun initComposable(
         testBody: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>.() -> Unit,
     ) {
@@ -95,6 +140,7 @@ class OrderSummaryScreenTest : BaseScreenTest() {
                 OrderSummaryScreen(
                     productList = emptyList(),
                     viewModel = viewModel,
+                    onOrderSuccess = mockOnOrderSuccess,
                 )
             }
         }

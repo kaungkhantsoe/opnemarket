@@ -199,8 +199,9 @@ class HomeScreenTest : BaseScreenTest() {
         composeRule.activity.setContent {
             ComposeTheme {
                 HomeScreen(
+                    isOrderSuccess = false,
                     viewModel = viewModel,
-                    onClickViewOrder = mockOnClickViewOrder
+                    onClickViewOrder = mockOnClickViewOrder,
                 )
             }
         }

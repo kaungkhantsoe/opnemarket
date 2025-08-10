@@ -55,6 +55,7 @@ import coil3.compose.AsyncImage
 @Composable
 fun OrderSummaryScreen(
     productList: List<ProductUiModel>,
+    onOrderSuccess: () -> Unit,
     viewModel: OrderSummaryViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -62,6 +63,10 @@ fun OrderSummaryScreen(
 
     val products by viewModel.products.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
+    viewModel.onPlaceOrderSuccess.collectAsEffect {
+        onOrderSuccess()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.setProducts(productList)

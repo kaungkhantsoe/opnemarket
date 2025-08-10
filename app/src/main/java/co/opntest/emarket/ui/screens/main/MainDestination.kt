@@ -4,6 +4,7 @@ import co.opntest.emarket.ui.base.BaseAppDestination
 import co.opntest.emarket.ui.models.ProductUiModel
 
 const val SelectedProductListKey = "SelectedProductListKey"
+const val IsOrderSuccessKey = "IsOrderSuccessKey"
 
 sealed class MainDestination {
 
@@ -14,4 +15,6 @@ sealed class MainDestination {
             parcelableArgument = SelectedProductListKey to value
         }
     }
+
+    object OrderSuccess : BaseAppDestination("order_success")
 }

@@ -112,6 +112,19 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun `When calling clearSelectedProducts, it clears the selected count of all products`() = runTest {
+        initViewModel()
+
+        viewModel.updateProductCount(2, MockUtil.productModel.toUiModel())
+
+        viewModel.getSelectedProducts() shouldBe listOf(MockUtil.productModel.toUiModel().copy(selectedCount = 2))
+
+        viewModel.clearSelectedProducts()
+
+        viewModel.getSelectedProducts() shouldBe emptyList()
+    }
+
+    @Test
     fun `When loading models, it shows and hides loading correctly`() = runTest {
         initViewModel(dispatchers = CoroutineTestRule(StandardTestDispatcher()).testDispatcherProvider)
 

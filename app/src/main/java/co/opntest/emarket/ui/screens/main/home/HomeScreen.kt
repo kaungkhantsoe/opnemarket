@@ -17,6 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,7 @@ import coil3.compose.AsyncImage
 
 @Composable
 fun HomeScreen(
+    isOrderSuccess: Boolean,
     viewModel: HomeViewModel = hiltViewModel(),
     onClickViewOrder: (products: List<ProductUiModel>) -> Unit,
 ) = BaseScreen {
@@ -63,6 +65,10 @@ fun HomeScreen(
     viewModel.error.collectAsEffect { e ->
         isError = true
         e.showToast(context)
+    }
+
+    LaunchedEffect(isOrderSuccess) {
+        if (isOrderSuccess) viewModel.clearSelectedProducts()
     }
 
     HomeScreenContent(
