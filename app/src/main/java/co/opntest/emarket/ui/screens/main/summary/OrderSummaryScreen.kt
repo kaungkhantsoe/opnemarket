@@ -32,16 +32,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.opntest.emarket.R
+import co.opntest.emarket.extensions.collectAsEffect
+import co.opntest.emarket.lib.IsLoading
 import co.opntest.emarket.ui.models.ProductUiModel
+import co.opntest.emarket.ui.screens.common.AppLoadingContent
+import co.opntest.emarket.ui.showToast
 import co.opntest.emarket.ui.theme.AppTheme
 import coil3.compose.AsyncImage
 
@@ -50,23 +57,31 @@ fun OrderSummaryScreen(
     productList: List<ProductUiModel>,
     viewModel: OrderSummaryViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    viewModel.error.collectAsEffect { it.showToast(context) }
+
     val products by viewModel.products.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.setProducts(productList)
     }
 
     OrderSummaryScreenContent(
+        isLoading = isLoading,
         products = products,
         totalPrice = viewModel.getTotalPrice(),
+        onClickPlaceOrder = viewModel::placeOrder
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun OrderSummaryScreenContent(
+    isLoading: IsLoading,
     products: List<ProductUiModel>,
     totalPrice: Double,
+    onClickPlaceOrder: (deliveryAddress: String) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     var deliveryAddress by remember { mutableStateOf("") }
@@ -102,7 +117,10 @@ private fun OrderSummaryScreenContent(
                 Spacer(modifier = Modifier.height(AppTheme.dimensions.spacingMedium))
 
                 Button(
-                    onClick = {},
+                    enabled = !isLoading,
+                    onClick = {
+                        onClickPlaceOrder(deliveryAddress)
+                    },
                     content = {
                         Row {
                             Text(
@@ -124,11 +142,17 @@ private fun OrderSummaryScreenContent(
         LazyColumn(
             contentPadding = PaddingValues(AppTheme.dimensions.spacingMedium),
             verticalArrangement = Arrangement.spacedBy(AppTheme.dimensions.spacingMedium),
-            modifier = Modifier.padding(paddingValues).focusable()
+            modifier = Modifier
+                .padding(paddingValues)
+                .focusable()
         ) {
             items(products) { product ->
                 ProductItem(product)
             }
+        }
+
+        if (isLoading) {
+            AppLoadingContent()
         }
     }
 }
@@ -171,22 +195,45 @@ private fun ProductItem(
 
 @Preview
 @Composable
-private fun OrderSummaryScreenPreview() {
+private fun OrderSummaryScreenPreview(
+    @PreviewParameter(OrderSummaryScreenPreviewParameters::class)
+    param: OrderSummaryScreenPreviewParameters.Params,
+) {
     OrderSummaryScreenContent(
-        products = listOf(
-            ProductUiModel(
-                name = "Product 1",
-                price = 10.0,
-                imageUrl = "https://www.nespresso.com/ncp/res/uploads/recipes/nespresso-recipes-Latte-Art-Tulip.jpg",
-                selectedCount = 2
-            ),
-            ProductUiModel(
-                name = "Product 2",
-                price = 15.0,
-                imageUrl = "https://www.nespresso.com/ncp/res/uploads/recipes/nespresso-recipes-Latte-Art-Tulip.jpg",
-                selectedCount = 1
-            )
+        products = param.products,
+        totalPrice = param.totalPrice,
+        isLoading = param.isLoading,
+        onClickPlaceOrder = {}
+    )
+}
+
+private class OrderSummaryScreenPreviewParameters :
+    PreviewParameterProvider<OrderSummaryScreenPreviewParameters.Params> {
+
+    override val values: Sequence<Params>
+        get() = sequenceOf(
+            Params(),
+            Params(isLoading = true),
+        )
+
+    private val productList = listOf(
+        ProductUiModel(
+            name = "Product 1",
+            price = 10.0,
+            imageUrl = "https://www.nespresso.com/ncp/res/uploads/recipes/nespresso-recipes-Latte-Art-Tulip.jpg",
+            selectedCount = 2
         ),
-        totalPrice = 100.0,
+        ProductUiModel(
+            name = "Product 2",
+            price = 15.0,
+            imageUrl = "https://www.nespresso.com/ncp/res/uploads/recipes/nespresso-recipes-Latte-Art-Tulip.jpg",
+            selectedCount = 1
+        )
+    )
+
+    inner class Params(
+        val isLoading: IsLoading = false,
+        val products: List<ProductUiModel> = productList,
+        val totalPrice: Double = productList.sumOf { it.price * it.selectedCount }
     )
 }

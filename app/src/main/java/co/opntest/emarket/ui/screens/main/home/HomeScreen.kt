@@ -224,8 +224,7 @@ private fun ProductItem(
 private fun HomeScreenPreview(
     @PreviewParameter(HomeScreenPreviewParameters::class)
     param: HomeScreenPreviewParameters.Params,
-
-    ) {
+) {
     ComposeTheme {
         HomeScreenContent(
             enableViewOrder = param.enableViewOrder,
@@ -277,7 +276,7 @@ private class HomeScreenPreviewParameters : PreviewParameterProvider<HomeScreenP
             )
         )
 
-    data class Params(
+    inner class Params(
         val isLoading: IsLoading = false,
         val storeDetail: StoreDetailUiModel? = null,
         val isError: Boolean = false,

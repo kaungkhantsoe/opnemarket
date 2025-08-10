@@ -9,11 +9,16 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import co.opntest.emarket.R
+import co.opntest.emarket.domain.usecases.PlaceOrderUseCase
 import co.opntest.emarket.test.MockUtil
 import co.opntest.emarket.ui.models.toUiModel
 import co.opntest.emarket.ui.screens.BaseScreenTest
 import co.opntest.emarket.ui.screens.MainActivity
 import co.opntest.emarket.ui.theme.ComposeTheme
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.flow.flowOf
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,8 +30,15 @@ class OrderSummaryScreenTest : BaseScreenTest() {
     @get:Rule
     val composeRule = createAndroidComposeRule<MainActivity>()
 
+    private val mockPlaceOrderUseCase: PlaceOrderUseCase = mockk()
+
     private lateinit var viewModel: OrderSummaryViewModel
     private val productList = listOf(MockUtil.productModel.toUiModel().copy(selectedCount = 2))
+
+    @Before
+    fun setUp() {
+        every { mockPlaceOrderUseCase(any()) } returns flowOf(Unit)
+    }
 
     @Test
     fun `When entering the Order Summary screen, it shows the correct UI`() {
@@ -90,6 +102,9 @@ class OrderSummaryScreenTest : BaseScreenTest() {
     }
 
     private fun initViewModel() {
-        viewModel = OrderSummaryViewModel()
+        viewModel = OrderSummaryViewModel(
+            coroutinesRule.testDispatcherProvider,
+            mockPlaceOrderUseCase
+        )
     }
 }
